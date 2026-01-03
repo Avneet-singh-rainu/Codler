@@ -11,7 +11,9 @@ namespace Codler
     [TagType(typeof(UserMethodHighlightTag))]
     internal sealed class UserMethodTaggerProvider : IViewTaggerProvider
     {
-        public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag
+        public ITagger<T> CreateTagger<T>(
+            ITextView textView,
+            ITextBuffer buffer) where T : ITag
         {
             if (textView.TextBuffer != buffer)
                 return null;

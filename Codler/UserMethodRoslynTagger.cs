@@ -12,34 +12,18 @@ namespace Codler
     internal sealed class UserMethodTagger : ITagger<UserMethodHighlightTag>
     {
         private readonly ITextBuffer _buffer;
-        private List<(SnapshotSpan span, bool isDefinition)> _spans = new();
+        private readonly List<(SnapshotSpan Span, bool IsDefinition)> _spans = new();
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
         public UserMethodTagger(ITextBuffer buffer)
         {
             _buffer = buffer;
-            _buffer.Changed += BufferChanged;
-            RecomputeHighlights();
+            _buffer.Changed += (_, __) => Recompute();
+            Recompute();
         }
 
-        private void BufferChanged(object sender, TextContentChangedEventArgs e)
-        {
-            RecomputeHighlights();
-
-            TagsChanged?.Invoke(this,
-                new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, 0, _buffer.CurrentSnapshot.Length)));
-        }
-
-        public IEnumerable<ITagSpan<UserMethodHighlightTag>> GetTags(NormalizedSnapshotSpanCollection spans)
-        {
-            foreach (var t in _spans)
-            {
-                yield return new TagSpan<UserMethodHighlightTag>(t.span, new UserMethodHighlightTag(t.isDefinition));
-            }
-        }
-
-        private void RecomputeHighlights()
+        private void Recompute()
         {
             _spans.Clear();
 
@@ -54,36 +38,61 @@ namespace Codler
             var model = compilation.GetSemanticModel(tree);
             var root = tree.GetRoot();
 
-            // 1️⃣ Method definitions
-            foreach (var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>())
+            // Method + constructor definitions
+            foreach (var m in root.DescendantNodes().OfType<BaseMethodDeclarationSyntax>())
             {
-                _spans.Add((new SnapshotSpan(snapshot, method.Identifier.Span.Start, method.Identifier.Span.Length), true));
+                var id = m switch
+                {
+                    MethodDeclarationSyntax md => md.Identifier,
+                    ConstructorDeclarationSyntax cd => cd.Identifier,
+                    _ => default
+                };
+
+                if (id != default)
+                {
+                    _spans.Add((
+                        new SnapshotSpan(snapshot, id.Span.Start, id.Span.Length),
+                        true
+                    ));
+                }
             }
 
-            // 2️⃣ Constructor definitions
-            foreach (var ctor in root.DescendantNodes().OfType<ConstructorDeclarationSyntax>())
-            {
-                _spans.Add((new SnapshotSpan(snapshot, ctor.Identifier.Span.Start, ctor.Identifier.Span.Length), true));
-            }
-
-            // 3️⃣ User-defined method calls
+            // Method invocations
             foreach (var call in root.DescendantNodes().OfType<InvocationExpressionSyntax>())
             {
-                SimpleNameSyntax id = call.Expression switch
+                SimpleNameSyntax name = call.Expression switch
                 {
                     IdentifierNameSyntax i => i,
                     MemberAccessExpressionSyntax m => m.Name,
                     _ => null
                 };
-                if (id == null) continue;
 
-                var sym = model.GetSymbolInfo(id).Symbol as IMethodSymbol;
-                if (sym == null) continue;
+                if (name == null) continue;
 
-                if (sym.Locations.Any(l => l.IsInSource))
+                var sym = model.GetSymbolInfo(name).Symbol as IMethodSymbol;
+                if (sym?.Locations.Any(l => l.IsInSource) == true)
                 {
-                    _spans.Add((new SnapshotSpan(snapshot, id.Identifier.Span.Start, id.Identifier.Span.Length), false));
+                    _spans.Add((
+                        new SnapshotSpan(snapshot, name.Identifier.Span.Start, name.Identifier.Span.Length),
+                        false
+                    ));
                 }
+            }
+
+            TagsChanged?.Invoke(
+                this,
+                new SnapshotSpanEventArgs(
+                    new SnapshotSpan(snapshot, 0, snapshot.Length)));
+        }
+
+        public IEnumerable<ITagSpan<UserMethodHighlightTag>> GetTags(
+            NormalizedSnapshotSpanCollection spans)
+        {
+            foreach (var item in _spans)
+            {
+                yield return new TagSpan<UserMethodHighlightTag>(
+                    item.Span,
+                    new UserMethodHighlightTag(item.IsDefinition));
             }
         }
     }

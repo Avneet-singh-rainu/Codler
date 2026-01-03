@@ -60,6 +60,8 @@
       <Generator>VsctGenerator</Generator>
       <LastGenOutput>VSCommandTable.cs</LastGenOutput>
     </VSCTCompile>
+    <Compile Include="UserMethodAdornmentFactory.cs" />
+    <Compile Include="UserMethodAdornmentLayer.cs" />
     <Compile Include="UserMethodFormatDefinition.cs" />
     <Compile Include="UserMethodHighlightTag.cs" />
     <Compile Include="UserMethodRoslynTagger.cs" />
