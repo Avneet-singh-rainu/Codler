@@ -12,7 +12,7 @@ namespace Codler
         public const string Name = "Codler";
         public const string Description = @"Highlights all user-defined methods and their calls in C# files with custom colors and font size.";
         public const string Language = "en-US";
-        public const string Version = "1.0";
+        public const string Version = "1.1";
         public const string Author = "Avneet Singh";
         public const string Tags = "C#, Visual Studio, Syntax Highlighting, User Methods, Code Readability, VSIX";
         public const bool IsPreview = true;

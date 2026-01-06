@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Codler.978ced38-0c90-442a-b6b2-be51c4591b9c" Version="1.0" Language="en-US" Publisher="Avneet Singh" />
+        <Identity Id="Codler.978ced38-0c90-442a-b6b2-be51c4591b9c" Version="1.1" Language="en-US" Publisher="Avneet Singh" />
         <DisplayName>Codler</DisplayName>
         <Description xml:space="preserve">Highlights all user-defined methods and their calls in C# files with custom colors and font size.</Description>
         <ReleaseNotes>2022, 2023, 2025, 2026 (or 17.0+)</ReleaseNotes>
