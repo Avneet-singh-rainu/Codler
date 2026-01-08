@@ -58,6 +58,7 @@ namespace Codler
         [Category("Font")]
         [DisplayName("Font Family")]
         [Description("Font family for user-defined methods.")]
+        [TypeConverter(typeof(FontFamilyConverter))]
         public string FontFamily
         {
             get => _fontFamily;
@@ -90,11 +91,36 @@ namespace Codler
         // Colors
         // -------------------------
 
+        private Color _definitionForegroundColor = Colors.LightGreen;
+
+        [Category("Colors - Method Definitions")]
+        [DisplayName("Definition Foreground Color")]
+        [Description("Text color for user-defined method definitions.")]
+        [TypeConverter(typeof(ColorConverter))]
+        public Color DefinitionForegroundColor
+        {
+            get => _definitionForegroundColor;
+            set => _definitionForegroundColor = value;
+        }
+
+        private Color _invocationForegroundColor = Colors.Yellow;
+
+        [Category("Colors - Method Invocations")]
+        [DisplayName("Invocation Foreground Color")]
+        [Description("Text color for user-defined method invocations.")]
+        [TypeConverter(typeof(ColorConverter))]
+        public Color InvocationForegroundColor
+        {
+            get => _invocationForegroundColor;
+            set => _invocationForegroundColor = value;
+        }
+
         private Color _foregroundColor = Colors.Yellow;
 
         [Category("Colors")]
-        [DisplayName("Foreground Color")]
-        [Description("Text color for user-defined methods.")]
+        [DisplayName("Foreground Color (Legacy)")]
+        [Description("Legacy text color for user-defined methods.")]
+        [TypeConverter(typeof(ColorConverter))]
         public Color ForegroundColor
         {
             get => _foregroundColor;
@@ -106,6 +132,7 @@ namespace Codler
         [Category("Colors")]
         [DisplayName("Background Color")]
         [Description("Background color for user-defined methods.")]
+        [TypeConverter(typeof(ColorConverter))]
         public Color BackgroundColor
         {
             get => _backgroundColor;
@@ -125,13 +152,35 @@ namespace Codler
 
         private int opacityPercent = 35;
 
-        [Category("User Method Highlight")]
-        [DisplayName("Highlight Opacity (%)")]
-        [Description("Opacity of user method highlight (10 - 100)")]
-        public int OpacityPercent
+        [Category("Colors - Method Definitions")]
+        [DisplayName("Definition Opacity (%)")]
+        [Description("Opacity of user method definition highlight (10 - 100)")]
+        public int DefinitionOpacityPercent
         {
             get { return opacityPercent; }
             set { opacityPercent = value; }
+        }
+
+        private int invocationOpacityPercent = 35;
+
+        [Category("Colors - Method Invocations")]
+        [DisplayName("Invocation Opacity (%)")]
+        [Description("Opacity of user method invocation highlight (10 - 100)")]
+        public int InvocationOpacityPercent
+        {
+            get { return invocationOpacityPercent; }
+            set { invocationOpacityPercent = value; }
+        }
+
+        private int legacyOpacityPercent = 35;
+
+        [Category("User Method Highlight")]
+        [DisplayName("Highlight Opacity (%) [Legacy]")]
+        [Description("Legacy opacity of user method highlight (10 - 100)")]
+        public int OpacityPercent
+        {
+            get { return legacyOpacityPercent; }
+            set { legacyOpacityPercent = value; }
         }
 
 
@@ -142,5 +191,33 @@ namespace Codler
             return value;
         }
 
+    }
+
+    // Custom font family converter with dropdown values
+    public class FontFamilyConverter : StringConverter
+    {
+        private static readonly string[] CommonFonts = new[]
+        {
+            "Arial", "Calibri", "Cambria", "Candara", "Consolas", "Constantia", "Corbel", "Courier New",
+            "Ebrima", "Franklin Gothic Medium", "Gabriola", "Georgia", "Impact", "Lucida Console",
+            "Lucida Sans Unicode", "Microsoft Sans Serif", "Palatino Linotype", "Segoe UI",
+            "Segoe UI Light", "Segoe UI Semibold", "Segoe UI Symbol", "Tahoma", "Times New Roman",
+            "Trebuchet MS", "Verdana", "Webdings", "Wingdings"
+        };
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return new StandardValuesCollection(CommonFonts);
+        }
+
+        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        {
+            return false; // Allow custom font names
+        }
     }
 }

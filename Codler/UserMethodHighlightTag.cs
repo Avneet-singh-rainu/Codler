@@ -7,7 +7,7 @@ namespace Codler
         public bool IsDefinition { get; }
 
         public UserMethodHighlightTag(bool isDefinition)
-            : base("CodlerUserMethod")
+            : base(isDefinition ? "CodlerUserMethodDefinition" : "CodlerUserMethodInvocation")
         {
             IsDefinition = isDefinition;
         }
